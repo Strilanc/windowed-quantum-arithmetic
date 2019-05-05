@@ -290,6 +290,16 @@ This windowed implementation of product addition has an asymptotic Toffoli count
 Setting the window size to $w=\lg n$, so that the table lookup is as expensive as the addition, achieves a Toffoli complexity of $O(n^2/\lg n)$.
 A logarithmic factor improvement over the construction we started with.
 
+We used Q\# to measure the cost of our windowed construction versus other constructions.
+See \fig{product-add-costs}.
+The estimation methodology is as follows.
+We implemented all three constructions in Q\#, and then iterated over problem sizes while using the tracing simulator to count the number of Toffolis and the number of qubits.
+We generated one random problem at each problem size, and fed it to all three constructions while checking that they each returned the correct result.
+Note that we were not able to use the table lookup uncomputation optimization, because it was incompatible with Q\#'s Toffoli simulator.
+
+We amortized the resulting numbers in order to make differences easier to see.
+To estimate the physical spacetime numbers we assumed a code distance of 31, a control system reaction time of 10 microseconds, and that ``time optimal computing" \cite{fowler2012time} was being used.
+
 
 \subsection{Multiplication}
 
@@ -490,6 +500,18 @@ Setting $w_e=w_m=\frac{1}{2}\lg n$ achieves a Toffoli complexity of $O(\frac{n_e
     \caption{
         \label{fig:multiply-add}
         A modular product addition circuit using windowed arithmetic, where the factor to multiply by is derived from a small number of input qubits from an exponent in a modular exponentiation.
+    }
+\end{figure}
+
+\begin{figure}
+    \centering
+    \resizebox{\linewidth}{!}{
+        \includegraphics{assets/costs.png}
+    }
+    \caption{
+        \label{fig:product-add-costs}
+        Amortized costs of performing the operation $x \pluseq ky$ where $k$ is a classical constant using windowed arithmetic, iteration over the classical constant, and the Karatsuba multiplication procedure from \cite{gidney2019karatsuba}.
+        Although the Karatsuba volume curve will eventually go below the windowed arithmetic volume curve, this does not happen until well past factor sizes that would be relevant in practice.
     }
 \end{figure}
 
