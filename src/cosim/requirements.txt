@@ -1,3 +1,0 @@
-numpy
-cirq
-pytest

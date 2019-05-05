@@ -5,6 +5,7 @@
 **/__pycache__/*
 **/.venv/*
 **/.cache/*
+**/.vscode/*
 
 main.aux
 main.bbl
