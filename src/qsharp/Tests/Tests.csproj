@@ -16,6 +16,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\FastShor\FastShor.csproj" />
+    <ProjectReference Include="..\WindowedArithmetic\WindowedArithmetic.csproj" />
   </ItemGroup>
 </Project>

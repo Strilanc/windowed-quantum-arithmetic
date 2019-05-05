@@ -3,7 +3,7 @@
     open Microsoft.Quantum.Canon;
     open Microsoft.Quantum.Extensions.Convert;
     open Microsoft.Quantum.Extensions.Diagnostics;
-    open FastShor;
+    open WindowedArithmetic;
 
     /// # Summary
     /// Checks that the given operation, when applied to LittleEndian registers storing
@@ -70,7 +70,7 @@
                        op(_, z, _));
     }
 
-    operation ToffoliSim_PlusEqualConstTimesLE_RawCases_Test() : Unit {
+    operation ToffoliSim_PlusEqualConstTimesLE_Test() : Unit {
         AssertOpImplementsPlusEqualConstTimesLE(PlusEqualConstTimesLE);
         AssertOpImplementsPlusEqualConstTimesLE(PlusEqualConstTimesLEKaratsuba);
         AssertOpImplementsPlusEqualConstTimesLE(PlusEqualConstTimesLEWindowed(_, _, _, 1));

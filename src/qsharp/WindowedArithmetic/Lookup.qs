@@ -1,4 +1,4 @@
-﻿namespace FastShor {
+﻿namespace WindowedArithmetic {
     open Microsoft.Quantum.Extensions.Bitwise;
     open Microsoft.Quantum.Primitive;
     open Microsoft.Quantum.Canon;

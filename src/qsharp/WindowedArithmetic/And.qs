@@ -1,4 +1,4 @@
-﻿namespace FastShor {
+﻿namespace WindowedArithmetic {
     open Microsoft.Quantum.Extensions.Bitwise;
     open Microsoft.Quantum.Primitive;
     open Microsoft.Quantum.Canon;
@@ -10,6 +10,7 @@
         adjoint self;
         controlled (cs, ...) {
             Controlled X(cs, t);
+            // HACK: avoid incompatibility with toffoli simulator.
             // if (Length(cs) == 0) {
             //     X(t);
             // } elif (Length(cs) == 1) {
@@ -33,6 +34,7 @@
         controlled auto;
         controlled adjoint (cs, ...) {
             Controlled X(cs, t);
+            // HACK: avoid incompatibility with toffoli simulator.
             // if (Length(cs) == 0) {
             //     X(t);
             // } elif (Length(cs) == 1) {
@@ -57,6 +59,7 @@
     operation InitAnd(a: Qubit, b: Qubit, t: Qubit) : Unit {
         body(...) {
             CCNOT(a, b, t);
+            // HACK: avoid incompatibility with toffoli simulator.
             // H(t);
             // T(t);
             // CNOT(b, t);
@@ -70,6 +73,7 @@
         }
         adjoint (...) {
             CCNOT(a, b, t);
+            // HACK: avoid incompatibility with toffoli simulator.
             // if (MResetX(t) == One) {
             //     CZ(a, b);
             // }

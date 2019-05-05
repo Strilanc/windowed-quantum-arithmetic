@@ -6,12 +6,12 @@ using Microsoft.Quantum.Simulation.Core;
 using Microsoft.Quantum.Simulation.Simulators;
 using Microsoft.Quantum.Simulation.Simulators.QCTraceSimulators;
 
-namespace FastShor {
+namespace WindowedArithmetic {
     class Driver {
         static void Main(string[] args) {
             var rng = new Random(5);
 
-            // Binary integers of the form XXX0000000...
+            // Binary integers of the form 1XXX0000000...
             var cases = new List<int>();
             for (var i = 8; i <= 2048; i <<= 1) {
                 for (var j = 0; j < 8; j++) {
@@ -21,7 +21,11 @@ namespace FastShor {
 
             // Header column.
             Console.WriteLine($"{String.Join(", ", cases)}");
-            var methods = new[] {"window", "legacy", "karatsuba"};
+            var methods = new[] {
+                "window",
+                "legacy",
+                "karatsuba"
+            };
             var columns = new List<String>();
             columns.Add("n");
             foreach (var method in methods) {
@@ -33,7 +37,6 @@ namespace FastShor {
 
             // Collect data.
             foreach (var n in cases) {
-                if (n <= 768) continue;
                 var tofCounts = new double[methods.Length];
                 var qubitCounts = new double[methods.Length];
                 var depthCounts = new double[methods.Length];
@@ -45,14 +48,18 @@ namespace FastShor {
                         var b = rng.NextBigInt(n);
                         var c = rng.NextBigInt(n);
 
+                        var tof_sim = new ToffoliSimulator();
+                        var tof_output = RunPlusEqualProductMethod.Run(tof_sim, a, b, c, methods[i]).Result;
+
                         var config = new QCTraceSimulatorConfiguration();
                         config.usePrimitiveOperationsCounter = true;
                         config.useWidthCounter = true;
                         config.useDepthCounter = true;
                         var trace_sim = new QCTraceSimulator(config);
-                        var output = RunPlusEqualProductMethod.Run(trace_sim, a, b, c, methods[i]).Result;
-                        if (output != a + b * c) {
-                            throw new ArithmeticException($"Wrong result using {methods[i]}. {a}+{b}*{c} == {a+b*c} != {output}.");
+                        var trace_output = RunPlusEqualProductMethod.Run(trace_sim, a, b, c, methods[i]).Result;
+
+                        if (tof_output != a + b * c || trace_output != tof_output) {
+                            throw new ArithmeticException($"Wrong result using {methods[i]}. {a}+{b}*{c} == {a+b*c} != {tof_output} or {trace_output}.");
                         }
 
                         tofCounts[i] += trace_sim.GetMetric<RunPlusEqualProductMethod>(PrimitiveOperationsGroupsNames.T)/7;
