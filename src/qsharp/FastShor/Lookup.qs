@@ -1,8 +1,8 @@
-﻿namespace FastShor
-{
+﻿namespace FastShor {
     open Microsoft.Quantum.Extensions.Bitwise;
     open Microsoft.Quantum.Primitive;
     open Microsoft.Quantum.Canon;
+    open Microsoft.Quantum.Extensions.Convert;
 
     /// # Summary
     /// Performs 'a ^^^= T[b]' where 'a' and 'b' are little-endian quantum registers
@@ -21,7 +21,7 @@
     /// ## address
     /// Determines which integer from the table will be xored into the target.
     /// The 'b' in 'a ^^^= T[b]'.
-    operation XorEqualLookup (lvalue: LittleEndian, table: Int[], address: LittleEndian) : Unit {
+    operation XorEqualLookup (lvalue: LittleEndian, table: BigInt[], address: LittleEndian) : Unit {
         body (...) {
             Controlled XorEqualLookup(new Qubit[0], (lvalue, table, address));
         }
@@ -47,9 +47,9 @@
 
             // Base case: singleton table.
             if (Length(table) == 1) {
-                XorEqualConst(address, -1);
+                XorEqualConst(address, ToBigInt(-1));
                 Controlled XorEqualConst(cs + address!, (lvalue, table[0]));
-                XorEqualConst(address, -1);
+                XorEqualConst(address, ToBigInt(-1));
                 return ();
             }
 
@@ -102,7 +102,7 @@
     /// - "Encoding Electronic Spectra in Quantum Circuits with Linear T Complexity"
     ///        Ryan Babbush, Craig Gidney, Dominic W. Berry, Nathan Wiebe, Jarrod McClean, Alexandru Paler, Austin Fowler, Hartmut Neven
     ///        https://arxiv.org/abs/1805.03662
-    operation LetLookup (lvalue: LittleEndian, table: Int[], address: LittleEndian) : Unit {
+    operation LetLookup (lvalue: LittleEndian, table: BigInt[], address: LittleEndian) : Unit {
         body (...) {
             XorEqualLookup(lvalue, table, address);
         }
@@ -111,38 +111,41 @@
         }
         controlled auto;
         controlled adjoint (cs, ...) {
-            let n = Min(Length(address!), CeilLg2(Length(table)));
-            let max = Min(1 <<< n, Length(table));
-            let n_low = Min((n >>> 1), FloorLg2(Length(lvalue!)));
-            let n_high = n - n_low;
-            let low = LittleEndian(address![0..n_low-1]);
-            let high = LittleEndian(address![n_low..n-1]);
-            mutable fixups = new Int[1 <<< n_high];
+            Controlled XorEqualLookup(cs, (lvalue, table, address));
 
-            // Determine fixups by performing eager measurements.
-            for (i in 0..Length(lvalue!)-1) {
-                if (MResetX(lvalue![i]) == One) {
-                    for (j in 0..max-1) {
-                        if ((table[j] &&& (1 <<< i)) != 0) {
-                            let fixup_index = j >>> n_low;
-                            let fixup_bit = j &&& ((1 <<< n_low) - 1);
-                            set fixups[fixup_index] = fixups[fixup_index] ^^^ (1 <<< fixup_bit);
-                        }
-                    }
-                }
-            }
+            // HACK: disabled to make testing with Toffoli simulator viable.
+            // let n = Min(Length(address!), CeilLg2(Length(table)));
+            // let max = Min(1 <<< n, Length(table));
+            // let n_low = Min((n >>> 1), FloorLg2(Length(lvalue!)));
+            // let n_high = n - n_low;
+            // let low = LittleEndian(address![0..n_low-1]);
+            // let high = LittleEndian(address![n_low..n-1]);
+            // mutable fixups = new BigInt[1 <<< n_high];
 
-            // Perform fixups.
-            let low_unary = LittleEndian(lvalue![0..(1<<<n_low)-1]);
-            LetUnary(low_unary, low);
-            for (t in low_unary!) {
-                H(t);
-            }
-            Controlled XorEqualLookup(cs, (low_unary, fixups, high));
-            for (t in low_unary!) {
-                H(t);
-            }
-            DelUnary(low_unary, low);
+            // // Determine fixups by performing eager measurements.
+            // for (i in 0..Length(lvalue!)-1) {
+            //     if (MResetX(lvalue![i]) == One) {
+            //         for (j in 0..max-1) {
+            //             if ((table[j] &&& (ToBigInt(1) <<< i)) != ToBigInt(0)) {
+            //                 let fixup_index = j >>> n_low;
+            //                 let fixup_bit = j &&& ((1 <<< n_low) - 1);
+            //                 set fixups[fixup_index] = fixups[fixup_index] ^^^ (ToBigInt(1) <<< fixup_bit);
+            //             }
+            //         }
+            //     }
+            // }
+
+            // // Perform fixups.
+            // let low_unary = LittleEndian(lvalue![0..(1<<<n_low)-1]);
+            // LetUnary(low_unary, low);
+            // for (t in low_unary!) {
+            //     H(t);
+            // }
+            // Controlled XorEqualLookup(cs, (low_unary, fixups, high));
+            // for (t in low_unary!) {
+            //     H(t);
+            // }
+            // DelUnary(low_unary, low);
         }
     }
 
@@ -163,7 +166,7 @@
     /// ## address
     /// Determines which integer from the table is supposed to be the target's value.
     /// The 'b' from 'a := T[b]'.
-    operation DelLookup (lvalue: LittleEndian, table: Int[], address: LittleEndian) : Unit {
+    operation DelLookup (lvalue: LittleEndian, table: BigInt[], address: LittleEndian) : Unit {
         body (...) {
             Adjoint LetLookup(lvalue, table, address);
         }
@@ -189,7 +192,7 @@
     /// ## address
     /// Determines which integer from the table will be added into the target.
     /// The 'b' in 'a += T[b]'.
-    operation PlusEqualLookup (lvalue: LittleEndian, table: Int[], address: LittleEndian) : Unit {
+    operation PlusEqualLookup (lvalue: LittleEndian, table: BigInt[], address: LittleEndian) : Unit {
         body (...) {
             Controlled PlusEqualLookup(new Qubit[0], (lvalue, table, address));
         }

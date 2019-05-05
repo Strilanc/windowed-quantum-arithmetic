@@ -1,8 +1,9 @@
 ﻿namespace FastShor {
     open Microsoft.Quantum.Extensions.Bitwise;
+    open Microsoft.Quantum.Extensions.Convert;
     open Microsoft.Quantum.Primitive;
     open Microsoft.Quantum.Canon;
-    
+
     /// # Summary
     /// Performs a ^^^= b where a and b are little-endian quantum registers.
     ///
@@ -36,10 +37,10 @@
     /// The target of the xor. The 'a' in 'a ^^^= k'.
     /// ## mask
     /// The integer to xor into the target. The 'k' in 'a ^^^= k'.
-    operation XorEqualConst (lvalue: LittleEndian, mask: Int) : Unit {
+    operation XorEqualConst (lvalue: LittleEndian, mask: BigInt) : Unit {
         body (...) {
             for (i in 0..Length(lvalue!)-1) {
-                if (((mask >>> i) &&& 1) != 0) {
+                if (((mask >>> i) &&& ToBigInt(1)) != ToBigInt(0)) {
                     X(lvalue![i]);
                 }
             }
@@ -49,7 +50,7 @@
         controlled adjoint self;
     }
 
-    operation LetConst (lvalue: LittleEndian, mask: Int) : Unit {
+    operation LetConst (lvalue: LittleEndian, mask: BigInt) : Unit {
         body (...) {
             XorEqualConst(lvalue, mask);
         }
@@ -58,7 +59,7 @@
         controlled adjoint self;
     }
 
-    operation DelConst (lvalue: LittleEndian, mask: Int) : Unit {
+    operation DelConst (lvalue: LittleEndian, mask: BigInt) : Unit {
         body (...) {
             Adjoint LetConst(lvalue, mask);
         }
