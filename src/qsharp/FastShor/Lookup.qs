@@ -67,7 +67,7 @@
 
                 // Do lookup for half of table where highBit is 0.
                 Controlled XorEqualLookup([q], (lvalue, lowTable, restAddress));
-                    
+
                 // Flip q to storing 'all(controls) and highBit'.
                 Controlled X(cs, q);
 

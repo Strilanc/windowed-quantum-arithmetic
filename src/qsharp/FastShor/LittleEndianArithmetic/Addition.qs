@@ -2,7 +2,7 @@
     open Microsoft.Quantum.Extensions.Bitwise;
     open Microsoft.Quantum.Primitive;
     open Microsoft.Quantum.Canon;
-    
+
     /// # Summary
     /// Performs a += b + c where a and b are little-endian quantum registers and c is a carry qubit.
     ///
@@ -25,7 +25,7 @@
             // Construction requires similarly-sized registers.
             let n = Length(offset!);
             let m = Length(lvalue!);
-            if (m != n && m != n + 1) {
+            if (m != n and m != n + 1) {
                 fail $"Length(lvalue) ({m}) != Length(offset) ({n}) && Length(lvalue) != Length(offset) + 1";
             }
 
