@@ -1,2 +1,5 @@
-This repository contains the assets, latex, and Q# code for my paper "Windowed quantum arithmetic using QROM lookups".
+# Windowed quantum arithmetic
+
+This repository contains the latex, assets, and Q# code for my paper "Windowed quantum arithmetic".
+This paper shows that windowing optimizations aren't just a classical thing; they can be used to improve quantum circuits.
 The paper is available at [[[NOT RELEASED YET]]].
